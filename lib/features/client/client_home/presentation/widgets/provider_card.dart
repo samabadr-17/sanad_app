@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../data/model/provider_model.dart';
-import'../../../../../core/constants/colors.dart';
+import '../../../../../core/constants/colors.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 class ProviderCards extends StatelessWidget {
   final List<ProviderModel> providers; // providers list from model file
@@ -10,6 +11,7 @@ class ProviderCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: providers.map((provider) {
         // map loops on list and create new card for each item
@@ -22,14 +24,15 @@ class ProviderCards extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Cream),
           ),
-          child: Row( // i can't make the initials and text from right to left
+          child: Row(
+            // i can't make the initials and text from right to left
             textDirection: TextDirection.rtl,
             children: [
               Expanded(
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: Text(
-                    'الإتاحة: 30 د',
+                    l10n.homeResponseTime,
                     style: TextStyle(color: Boxshadowcolor, fontSize: 10),
                   ),
                 ),
@@ -100,7 +103,7 @@ class ProviderCards extends StatelessWidget {
                           child: Row(
                             children: [
                               Text(
-                                ' ج.م ${provider.price} للزيارة',
+                                l10n.providerVisitPrice(provider.price),
                                 style: TextStyle(
                                   color: DarkTeal,
                                   fontSize: 8,

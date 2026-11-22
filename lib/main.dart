@@ -7,6 +7,7 @@ import 'package:sanad/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sanad/features/client/client_home/presentation/manager/client_home_provider.dart';
+import 'package:sanad/features/client/client_requests/presentation/manager/client_requests_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,16 +42,15 @@ class Sanad extends StatelessWidget {
       designSize: const Size(360, 690),
       minTextAdapt: true,
       splitScreenMode: true,
-      
+
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider(
-            create: (context) => ClientHomeProvider(),
-          ),
+          ChangeNotifierProvider(create: (context) => ClientHomeProvider()),
+          ChangeNotifierProvider(create: (context) => ClientRequestsProvider()),
         ],
         child: MaterialApp.router(
           theme: ThemeData(fontFamily: 'Cairo'),
-        
+
           title: 'Sanad',
           locale: const Locale('ar'),
           debugShowCheckedModeBanner: false,

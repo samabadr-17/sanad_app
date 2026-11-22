@@ -485,6 +485,102 @@ abstract class AppLocalizations {
   /// **'All your requests and appointments in one place'**
   String get requestsSubtitle;
 
+  /// No description provided for @noCustomerRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t submitted any requests yet'**
+  String get noCustomerRequests;
+
+  /// No description provided for @noCustomerRequestsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your service requests will appear here.'**
+  String get noCustomerRequestsDescription;
+
+  /// No description provided for @requestsLoginRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in to view your requests.'**
+  String get requestsLoginRequired;
+
+  /// No description provided for @requestDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Request details'**
+  String get requestDetailsTitle;
+
+  /// No description provided for @requestIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Request ID'**
+  String get requestIdLabel;
+
+  /// No description provided for @requestServiceTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Service type'**
+  String get requestServiceTypeLabel;
+
+  /// No description provided for @requestStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get requestStatusLabel;
+
+  /// No description provided for @requestDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get requestDateLabel;
+
+  /// No description provided for @requestAddressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed address'**
+  String get requestAddressLabel;
+
+  /// No description provided for @requestServiceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Service not specified'**
+  String get requestServiceUnavailable;
+
+  /// No description provided for @requestDateUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Date not set'**
+  String get requestDateUnavailable;
+
+  /// No description provided for @requestConfirmedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get requestConfirmedStatus;
+
+  /// No description provided for @requestInProgressStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get requestInProgressStatus;
+
+  /// No description provided for @requestCancelledStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get requestCancelledStatus;
+
+  /// No description provided for @requestUnknownStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get requestUnknownStatus;
+
+  /// No description provided for @closeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get closeButton;
+
   /// No description provided for @currentRequestsTab.
   ///
   /// In en, this message translates to:
@@ -677,6 +773,30 @@ abstract class AppLocalizations {
   /// **'Service address'**
   String get homeAddressTitle;
 
+  /// No description provided for @homeAddressLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Nasr City, Cairo'**
+  String get homeAddressLocation;
+
+  /// No description provided for @homeSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a service'**
+  String get homeSearchHint;
+
+  /// No description provided for @allServices.
+  ///
+  /// In en, this message translates to:
+  /// **'All services'**
+  String get allServices;
+
+  /// No description provided for @trackRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Track request'**
+  String get trackRequest;
+
   /// No description provided for @homeBannerEyebrow.
   ///
   /// In en, this message translates to:
@@ -790,12 +910,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Problem details'**
   String get requestDetailsLabel;
-
-  /// No description provided for @requestAddressLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Detailed address'**
-  String get requestAddressLabel;
 
   /// No description provided for @chooseRequestCategory.
   ///

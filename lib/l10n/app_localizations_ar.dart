@@ -204,6 +204,54 @@ class AppLocalizationsAr extends AppLocalizations {
   String get requestsSubtitle => 'كل بياناتك واحتياجاتك في مكان واحد';
 
   @override
+  String get noCustomerRequests => 'ماقدمتش أي طلبات لحد دلوقتي';
+
+  @override
+  String get noCustomerRequestsDescription => 'طلبات الخدمات اللي هتقدمها هتظهر هنا.';
+
+  @override
+  String get requestsLoginRequired => 'سجل دخولك عشان تشوف طلباتك.';
+
+  @override
+  String get requestDetailsTitle => 'تفاصيل الطلب';
+
+  @override
+  String get requestIdLabel => 'رقم الطلب';
+
+  @override
+  String get requestServiceTypeLabel => 'نوع الخدمة';
+
+  @override
+  String get requestStatusLabel => 'الحالة';
+
+  @override
+  String get requestDateLabel => 'التاريخ';
+
+  @override
+  String get requestAddressLabel => 'العنوان بالتفصيل';
+
+  @override
+  String get requestServiceUnavailable => 'الخدمة غير محددة';
+
+  @override
+  String get requestDateUnavailable => 'التاريخ غير محدد';
+
+  @override
+  String get requestConfirmedStatus => 'تم التأكيد';
+
+  @override
+  String get requestInProgressStatus => 'قيد التنفيذ';
+
+  @override
+  String get requestCancelledStatus => 'ملغي';
+
+  @override
+  String get requestUnknownStatus => 'غير معروف';
+
+  @override
+  String get closeButton => 'إغلاق';
+
+  @override
   String currentRequestsTab(int count) {
     return 'الجارية ($count)';
   }
@@ -304,6 +352,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeAddressTitle => 'عنوان الخدمة';
 
   @override
+  String get homeAddressLocation => 'مدينة نصر، القاهرة';
+
+  @override
+  String get homeSearchHint => 'تدور على أي خدمة؟';
+
+  @override
+  String get allServices => 'كل الخدمات';
+
+  @override
+  String get trackRequest => 'متابعة الطلب';
+
+  @override
   String get homeBannerEyebrow => 'سند يقرّب لك أهل الصنعة';
 
   @override
@@ -365,9 +425,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get requestDetailsLabel => 'تفاصيل المشكلة';
-
-  @override
-  String get requestAddressLabel => 'العنوان بالتفصيل';
 
   @override
   String get chooseRequestCategory => 'اختار نوع الخدمة';

@@ -204,6 +204,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get requestsSubtitle => 'All your requests and appointments in one place';
 
   @override
+  String get noCustomerRequests => 'You haven\'t submitted any requests yet';
+
+  @override
+  String get noCustomerRequestsDescription => 'Your service requests will appear here.';
+
+  @override
+  String get requestsLoginRequired => 'Log in to view your requests.';
+
+  @override
+  String get requestDetailsTitle => 'Request details';
+
+  @override
+  String get requestIdLabel => 'Request ID';
+
+  @override
+  String get requestServiceTypeLabel => 'Service type';
+
+  @override
+  String get requestStatusLabel => 'Status';
+
+  @override
+  String get requestDateLabel => 'Date';
+
+  @override
+  String get requestAddressLabel => 'Detailed address';
+
+  @override
+  String get requestServiceUnavailable => 'Service not specified';
+
+  @override
+  String get requestDateUnavailable => 'Date not set';
+
+  @override
+  String get requestConfirmedStatus => 'Confirmed';
+
+  @override
+  String get requestInProgressStatus => 'In progress';
+
+  @override
+  String get requestCancelledStatus => 'Cancelled';
+
+  @override
+  String get requestUnknownStatus => 'Unknown';
+
+  @override
+  String get closeButton => 'Close';
+
+  @override
   String currentRequestsTab(int count) {
     return 'Current ($count)';
   }
@@ -304,6 +352,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeAddressTitle => 'Service address';
 
   @override
+  String get homeAddressLocation => 'Nasr City, Cairo';
+
+  @override
+  String get homeSearchHint => 'Search for a service';
+
+  @override
+  String get allServices => 'All services';
+
+  @override
+  String get trackRequest => 'Track request';
+
+  @override
   String get homeBannerEyebrow => 'Skilled help, closer with Sanad';
 
   @override
@@ -365,9 +425,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get requestDetailsLabel => 'Problem details';
-
-  @override
-  String get requestAddressLabel => 'Detailed address';
 
   @override
   String get chooseRequestCategory => 'Choose a service category';

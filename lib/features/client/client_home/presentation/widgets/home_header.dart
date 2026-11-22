@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
-import'../../../../../core/constants/colors.dart';
+
+import '../../../../../core/constants/colors.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     return Column(
       children: [
         Row(
-          textDirection: TextDirection.ltr,
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
           children: [
             Container(
               width: 38,
@@ -31,15 +35,12 @@ class HomeHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'عنوان الخدمة',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: DimGray,
-                  ),
+                  l10n.homeAddressTitle,
+                  style: TextStyle(fontSize: 16, color: DimGray),
                 ),
                 SizedBox(height: 3),
                 Text(
-                  'مدينة نصر، القاهرة',
+                  l10n.homeAddressLocation,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -51,11 +52,7 @@ class HomeHeader extends StatelessWidget {
 
             SizedBox(width: 10),
 
-            Icon(
-              Icons.location_on_outlined,
-              color: DarkTeal,
-              size: 26,
-            ),
+            Icon(Icons.location_on_outlined, color: DarkTeal, size: 26),
           ],
         ),
 
@@ -63,19 +60,12 @@ class HomeHeader extends StatelessWidget {
 
         // search bar ui only "no search logic for now"
         TextField(
-          textDirection: TextDirection.rtl,
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
           decoration: InputDecoration(
-            hintText: 'تدور على أي خدمة؟',
-            hintTextDirection: TextDirection.rtl,
-            hintStyle: TextStyle(
-              fontSize: 12,
-              color: DimGray,
-            ),
-            prefixIcon: Icon(
-              Icons.search_rounded,
-              color: DarkTeal,
-              size: 22,
-            ),
+            hintText: l10n.homeSearchHint,
+            hintTextDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+            hintStyle: TextStyle(fontSize: 12, color: DimGray),
+            prefixIcon: Icon(Icons.search_rounded, color: DarkTeal, size: 22),
             filled: true,
             fillColor: Cream,
             contentPadding: const EdgeInsets.symmetric(
@@ -84,9 +74,7 @@ class HomeHeader extends StatelessWidget {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
-              borderSide: BorderSide(
-                color: DimGray,
-              ),
+              borderSide: BorderSide(color: DimGray),
             ),
           ),
         ),
