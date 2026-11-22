@@ -7,6 +7,21 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class Auth {
   final supa = Supabase.instance.client.auth;
 
+  //-------------------------------------- getUserTypeId --------------------------------------
+  // 1 = client | 2 = provider | 3 = admin
+  Future<int?> getUserTypeId() async {
+    try {
+      final data = await Supabase.instance.client
+          .from('users')
+          .select('user_type_id')
+          .eq('id', supa.currentUser!.id)
+          .single();
+      return data['user_type_id'] as int;
+    } catch (e) {
+      return null;
+    }
+  }
+
   // -------------------------------------- Login -----------------------------------------
   Future<bool> login(
     String email,
@@ -16,7 +31,34 @@ class Auth {
     try {
       await supa.signInWithPassword(email: email, password: password);
       if (!context.mounted) return false;
-      return true;
+
+      final userTypeId = await getUserTypeId();
+      if (!context.mounted) return false;
+
+      // Client -> Home User
+      if (userTypeId == 1) {
+        context.go('/clientHome');
+        return true;
+      }
+
+      // Provider -> Home Provider
+      if (userTypeId == 2) {
+        context.go('/homeProvider');
+        return true;
+      }
+
+      // Unknown type -> sign out and show error
+      await supa.signOut();
+      if (!context.mounted) return false;
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.rightSlide,
+        title: 'Error',
+        desc: 'Unknown User Type !',
+        btnOkOnPress: () {},
+      ).show();
+      return false;
     } on AuthException catch (e) {
       if (!context.mounted) return false;
 

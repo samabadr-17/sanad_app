@@ -138,22 +138,23 @@ class _LoginUserScreenState extends State<LoginUserScreen> {
                 Padding(
                   padding: EdgeInsets.all(8.w),
                   child: InkWell(
-                      onTap: () async {
-                        if (isLoading) return;
-                        if (!globKey.currentState!.validate()) return;
+                    onTap: () async {
+                      if (isLoading) return;
+                      if (!globKey.currentState!.validate()) return;
 
-                        setState(() => isLoading = true);
-                        final ok = await Auth().login(
-                          emailController.text.trim(),
-                          passwordController.text,
-                          context,
-                        );
-                        if (!mounted) return;
-                        setState(() => isLoading = false);
+                      setState(() => isLoading = true);
 
-                        // Navigate after successful login
-                        if (ok) context.go('/clientHome');
-                      },
+                      // Auth().login handles navigation by user type:
+                      // client -> /homeUser | provider -> /homeProvider
+                      await Auth().login(
+                        emailController.text.trim(),
+                        passwordController.text,
+                        context,
+                      );
+
+                      if (!mounted) return;
+                      setState(() => isLoading = false);
+                    },
                     child: CustomButton(
                       text: AppLocalizations.of(context)!.loginButton,
                       isLoading: isLoading,

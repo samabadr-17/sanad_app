@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:sanad/features/auth/presentation/screens/finish_otp_screen.dart';
 import 'package:sanad/features/auth/presentation/screens/forget_password.dart';
-import 'package:sanad/features/auth/presentation/screens/home_screen.dart';
+import 'package:sanad/features/auth/presentation/screens/home_provider.dart';
 import 'package:sanad/features/auth/presentation/screens/login_User_screen.dart';
 import 'package:sanad/features/auth/presentation/screens/new_Password.dart';
 import 'package:sanad/features/auth/presentation/screens/otp_screen.dart';
@@ -13,7 +13,8 @@ import 'package:sanad/features/splash/presentation/screens/splash_Screen.dart';
 final GoRouter router = GoRouter(
   initialLocation: '/splash',
   routes: [
-    GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
+    GoRoute(path: '/homeProvider', builder: (context, state) => HomeProvider()),
+
 
     GoRoute(path: '/splash', builder: (context, state) => SplashScreen()),
     GoRoute(path: '/signUp', builder: (context, state) => SignupScreen()),

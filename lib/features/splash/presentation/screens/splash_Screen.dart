@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sanad/core/constants/colors.dart';
+import 'package:sanad/features/auth/data/repo/auth.dart';
 import 'package:sanad/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -15,16 +16,45 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(milliseconds: 4000), () {
-      if (!mounted) return;
-      final loggedIn = Supabase.instance.client.auth.currentSession != null;
-      context.go(loggedIn ? '/home' : '/onboarding');
-    });
-  }
+@override
+void initState() {
+  super.initState();
 
+  Future.delayed(const Duration(milliseconds: 4000), () async {
+    if (!mounted) return;
+
+    final session = Supabase.instance.client.auth.currentSession;
+    final user = Supabase.instance.client.auth.currentUser;
+
+    debugPrint('========================');
+    debugPrint('SPLASH SESSION: ${session != null}');
+    debugPrint('SPLASH USER: ${user?.id}');
+    debugPrint('========================');
+
+    if (session == null) {
+      context.go('/onboarding');
+      return;
+    }
+
+    final type = await Auth().getUserTypeId();
+
+    debugPrint('USER TYPE: $type');
+
+    if (!mounted) return;
+
+    if (type == 1) {
+      context.go('/clientHome');
+    } else if (type == 2) {
+      context.go('/homeProvider');
+    } else {
+      await Supabase.instance.client.auth.signOut();
+
+      if (mounted) {
+        context.go('/loginUser');
+      }
+    }
+  });
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,7 +87,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     height: 4.h,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(2.r),
-                      color:DarkTeal,
+                      color: DarkTeal,
                     ),
                   ),
                 ],
@@ -79,7 +109,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 .fadeIn(duration: 1300.ms, curve: Curves.easeInOut)
                 .slideY(begin: 0.12, end: 0, duration: 1300.ms, curve: Curves.easeOutCubic),
             SizedBox(height: 80.h),
-            SpinKitThreeBounce(color:DimGray, size: 14.sp)
+            SpinKitThreeBounce(color: DimGray, size: 14.sp)
                 .animate(delay: 1400.ms)
                 .fadeIn(duration: 1000.ms, curve: Curves.easeInOut),
             SizedBox(height: 12.h),
