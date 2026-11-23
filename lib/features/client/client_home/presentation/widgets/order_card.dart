@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 
 import '../../data/model/order_model.dart';
-import'../../../../../core/constants/colors.dart';
+import '../../../../../core/constants/colors.dart';
 
 class OrderCards extends StatelessWidget {
-  final List<OrderModel> orders; // orders list from model file
+  final List<OrderModel> orders;
 
   const OrderCards({
     super.key,
@@ -14,8 +14,27 @@ class OrderCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    // Check if there are no orders
+    if (orders.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Text(
+            'You have no orders yet',
+            style: TextStyle(
+              color: DimGray,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Display order cards
     return Column(
-      children: orders.map((order) { // map loops through list items and create card for each one
+      children: orders.map((order) {
         return Container(
           width: double.infinity,
           margin: const EdgeInsets.only(bottom: 10),
@@ -27,7 +46,6 @@ class OrderCards extends StatelessWidget {
               color: Cream,
             ),
           ),
-
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -44,52 +62,58 @@ class OrderCards extends StatelessWidget {
                     ),
                     child: Text(
                       order.status,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: DarkTeal,
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Text(
                     order.id,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: DimGray,
                       fontSize: 10,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 12),
+
+              const SizedBox(height: 12),
+
               Text(
-                order.title,
-                style: TextStyle(
+                order.notes,
+                style: const TextStyle(
                   color: DarkTeal,
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 7),
-              Text(
-                order.details,
-                style: const TextStyle(
-                  color:Boxshadowcolor,
-                  fontSize: 10,
-                ),
-              ),
-              SizedBox(height: 7),
-              Text(
-                order.date,
-                style: const TextStyle(
-                  color: DimGray,
-                  fontSize: 10,
-                ),
-              ),
+
+              const SizedBox(height: 7),
+
+              // Text(
+              //   order.details,
+              //   style: const TextStyle(
+              //     color: Boxshadowcolor,
+              //     fontSize: 10,
+              //   ),
+              // ),
+
+              // const SizedBox(height: 7),
+
+              // Text(
+              //   order.date,
+              //   style: const TextStyle(
+              //     color: DimGray,
+              //     fontSize: 10,
+              //   ),
+              // ),
             ],
           ),
         );
-      }).toList(), // conver map to list
+      }).toList(),
     );
   }
 }

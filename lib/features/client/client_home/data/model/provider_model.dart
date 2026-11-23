@@ -1,23 +1,17 @@
 class ProviderModel {
   final String id;
-  final String serviceId; // id of the service provider offers
-  final String name; // provider name
-  final String initial; // first letters from the provider name
-  final String speciality; // provider proffision
-  final String rating; // provider rating
-  final String experience; // experience for how long
-  final String availablity; // provider is available when?
-  final int price; // price for the visit
+  final String categoryId;
+  final String name;
+  final String rating;
+  final String experience;
+  final int price;
 
   const ProviderModel({
     required this.id,
+    required this.categoryId,
     required this.name,
-    required this.initial,
-    required this.speciality,
     required this.rating,
     required this.experience,
-    required this.availablity, 
     required this.price,
-    required this.serviceId,
   });
 }

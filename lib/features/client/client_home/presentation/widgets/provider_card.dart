@@ -5,7 +5,7 @@ import '../../../../../core/constants/colors.dart';
 import '../../../../../l10n/app_localizations.dart';
 
 class ProviderCards extends StatelessWidget {
-  final List<ProviderModel> providers; // providers list from model file
+  final List<ProviderModel> providers;
 
   const ProviderCards({super.key, required this.providers});
 
@@ -14,132 +14,112 @@ class ProviderCards extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Column(
       children: providers.map((provider) {
-        // map loops on list and create new card for each item
+        final years = int.tryParse(provider.experience);
+        final experience = years == null
+            ? provider.experience
+            : l10n.providerExperience(years);
+
         return Container(
           width: double.infinity,
           margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: SeaShell,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Cream),
           ),
           child: Row(
-            // i can't make the initials and text from right to left
             textDirection: TextDirection.rtl,
             children: [
-              Expanded(
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Text(
-                    l10n.homeResponseTime,
-                    style: TextStyle(color: Boxshadowcolor, fontSize: 10),
-                  ),
+              Container(
+                width: 52,
+                height: 52,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Cream,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.person_outline,
+                  color: DarkTeal,
+                  size: 28,
                 ),
               ),
+              const SizedBox(width: 12),
               Expanded(
-                flex: 3,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      provider.name,
-                      style: TextStyle(
-                        color: DarkTeal,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      provider.speciality,
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        color: Boxshadowcolor,
-                        fontSize: 10,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      '★ ${provider.rating}',
-                      style: TextStyle(color: DarkTeal, fontSize: 10),
-                    ),
-                    SizedBox(height: 7),
                     Row(
                       textDirection: TextDirection.rtl,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Cream,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                '${provider.experience} , ${provider.availablity}',
-                                style: TextStyle(
-                                  color: DarkTeal,
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
+                        Expanded(
+                          child: Text(
+                            provider.name,
+                            textAlign: TextAlign.right,
+                            style: const TextStyle(
+                              color: DarkTeal,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                        Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+                        const SizedBox(width: 8),
+                        Text(
+                          '★ ${provider.rating.isEmpty ? '—' : provider.rating}',
+                          style: const TextStyle(
+                            color: DarkTeal,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
                           ),
-                          decoration: BoxDecoration(
-                            color: Cream,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                l10n.providerVisitPrice(provider.price),
-                                style: TextStyle(
-                                  color: DarkTeal,
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      alignment: WrapAlignment.end,
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        if (experience.isNotEmpty)
+                          _ProviderInfoChip(label: experience),
+                        _ProviderInfoChip(
+                          label: l10n.providerVisitPrice(provider.price),
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
-              SizedBox(width: 10),
-              Container(
-                width: 52,
-                height: 52,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: SeaShell,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Text(
-                  provider.initial,
-                  style: TextStyle(
-                    color: DarkTeal,
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
             ],
           ),
         );
-      }).toList(), // convert map to list
+      }).toList(),
+    );
+  }
+}
+
+class _ProviderInfoChip extends StatelessWidget {
+  final String label;
+
+  const _ProviderInfoChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      decoration: BoxDecoration(
+        color: Cream,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: DarkTeal,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }

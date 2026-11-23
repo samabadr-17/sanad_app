@@ -161,7 +161,30 @@ class ClientHomeScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                OrderCards(orders: homeProvider.orders),
+                if (homeProvider.isLoadingOrders)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator(color: Rust),
+                    ),
+                  )
+                else if (homeProvider.ordersError != null)
+                  Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          l10n.ordersLoadError,
+                          style: const TextStyle(color: DimGray),
+                        ),
+                        TextButton(
+                          onPressed: homeProvider.loadHomeData,
+                          child: Text(l10n.retryButton),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  OrderCards(orders: homeProvider.orders),
                 const SizedBox(height: 22),
 
                 Row(
@@ -183,7 +206,41 @@ class ClientHomeScreen extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 12),
-                ProviderCards(providers: homeProvider.providers),
+                if (homeProvider.isLoadingProviders)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator(color: Rust),
+                    ),
+                  )
+                else if (homeProvider.providersError != null)
+                  Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          isArabic
+                              ? 'تعذر تحميل مقدمي الخدمة'
+                              : 'Could not load providers.',
+                          style: const TextStyle(color: DimGray),
+                        ),
+                        TextButton(
+                          onPressed: homeProvider.loadHomeData,
+                          child: Text(l10n.retryButton),
+                        ),
+                      ],
+                    ),
+                  )
+                else if (homeProvider.providers.isEmpty)
+                  Center(
+                    child: Text(
+                      isArabic
+                          ? 'لا يوجد مقدمو خدمة متاحون حاليًا'
+                          : 'No providers are available right now.',
+                      style: const TextStyle(color: DimGray),
+                    ),
+                  )
+                else
+                  ProviderCards(providers: homeProvider.providers),
                 const SizedBox(height: 12),
               ],
             ),

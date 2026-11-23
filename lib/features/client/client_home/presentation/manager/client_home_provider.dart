@@ -10,6 +10,10 @@ class ClientHomeProvider extends ChangeNotifier {
   final List<ServiceModel> _services = [];
   final List<OrderModel> _orders = [];
   final List<ProviderModel> _providers = [];
+  bool _isLoadingOrders = false;
+  Object? _ordersError;
+  bool _isLoadingProviders = false;
+  Object? _providersError;
 
   ClientHomeProvider() {
     loadHomeData();
@@ -52,187 +56,117 @@ class ClientHomeProvider extends ChangeNotifier {
   }
 
   Future<void> _loadOrders() async {
-    final rows = await _tryReadTables([
-      'orders',
-      'service_requests',
-      'requests',
-      'bookings',
-      'appointments',
-    ]);
-    if (rows.isEmpty) return;
-
     final currentUserId = _supabase.auth.currentUser?.id;
-    final filteredRows = rows.where((row) {
-      if (currentUserId == null) return false;
-      for (final key in [
-        'client_id',
-        'user_id',
-        'customer_id',
-        'requested_by',
-      ]) {
-        if (row.containsKey(key) && row[key] != null) {
-          return row[key].toString() == currentUserId;
-        }
-      }
-      return true;
-    }).toList();
+    if (currentUserId == null) {
+      _orders.clear();
+      _isLoadingOrders = false;
+      _ordersError = null;
+      notifyListeners();
+      return;
+    }
 
-    _orders
-      ..clear()
-      ..addAll(
-        filteredRows
-            .map((row) {
-              final id = _readText(row, [
-                'id',
-                'order_id',
-                'request_id',
-                'booking_id',
-              ]);
-              final title = _readText(row, [
-                'title',
-                'name',
-                'service_name',
-                'category_name',
-                'description',
-              ]);
-              final status = _readText(row, [
-                'status',
-                'order_status',
-                'request_status',
-              ]);
-              final date = _readText(row, [
-                'scheduled_at',
-                'appointment_at',
-                'date',
-                'visit_date',
-                'created_at',
-              ]);
-              final providerName = _readText(row, [
-                'provider_name',
-                'technician_name',
-                'craftsman_name',
-              ]);
-              final location = _readText(row, [
-                'address',
-                'location',
-                'city',
-                'area',
-              ]);
-              final details = [
-                if (providerName.isNotEmpty) providerName,
-                if (location.isNotEmpty) location,
-              ].join(' • ');
-
-              return OrderModel(
-                id: id,
-                title: title,
-                status: status,
-                date: date,
-                details: details,
-              );
-            })
-            .where((order) => order.title.isNotEmpty),
-      );
+    _isLoadingOrders = true;
+    _ordersError = null;
     notifyListeners();
+    try {
+      final rows = await _supabase
+          .from('orders')
+          .select('*, category:categories(name)')
+          .eq('user_id', currentUserId)
+          .order('created_at', ascending: false);
+
+      _orders
+        ..clear()
+        ..addAll(
+          rows
+              .map((value) {
+                final row = Map<String, dynamic>.from(value);
+                final notes = _readText(row, ['notes', 'description']);
+                final category = row['category'];
+                final categoryName = category is Map
+                    ? _readText(Map<String, dynamic>.from(category), ['name'])
+                    : '';
+                var title = _readText(row, [
+                  'service_type',
+                  'service_name',
+                  'category_name',
+                  'title',
+                ]);
+                if (title.isEmpty) title = categoryName;
+                if (title.isEmpty) title = notes;
+                final displayNotes = notes.isEmpty ? title : notes;
+                final status = _readText(row, [
+                  'status',
+                  'order_status',
+                  'request_status',
+                ]);
+                final id = _readText(row, [
+                  'id',
+                  'order_id',
+                  'request_id',
+                  'booking_id',
+                ]);
+
+                return OrderModel(
+                  id: id,
+                  title: title,
+                  status: status,
+                  notes: displayNotes,
+                );
+              })
+              .where((order) => order.title.isNotEmpty),
+        );
+    } catch (error) {
+      _ordersError = error;
+    } finally {
+      _isLoadingOrders = false;
+      notifyListeners();
+    }
   }
 
   Future<void> _loadProviders() async {
-    final rows = await _tryReadTables([
-      'provider_profiles',
-      'providers',
-      'professionals',
-      'technicians',
-      'craftsmen',
-      'users',
-    ]);
-    if (rows.isEmpty) return;
-
-    final providerRows = rows.where((row) {
-      for (final key in ['user_type_id', 'role_id', 'role', 'account_type']) {
-        if (row.containsKey(key)) {
-          final value = row[key].toString().toLowerCase();
-          if (value == 'provider' ||
-              value == 'technician' ||
-              value == 'craftsman' ||
-              value == '2') {
-            return true;
-          }
-        }
-      }
-      return !row.containsKey('user_type_id') &&
-          !row.containsKey('role_id') &&
-          !row.containsKey('role') &&
-          !row.containsKey('account_type');
-    }).toList();
-
-    _providers
-      ..clear()
-      ..addAll(
-        providerRows
-            .map((row) {
-              final name = _readText(row, [
-                'name',
-                'full_name',
-                'display_name',
-                'provider_name',
-              ]);
-              final ratingValue = _readText(row, ['rating', 'average_rating']);
-              final reviewCount = _readText(row, [
-                'reviews_count',
-                'rating_count',
-              ]);
-              final rating = reviewCount.isNotEmpty
-                  ? '$ratingValue ($reviewCount)'
-                  : ratingValue;
-              final experienceValue = _readText(row, [
-                'experience',
-                'experience_years',
-                'years_of_experience',
-              ]);
-              final availability = _readText(row, [
-                'availability',
-                'availablity',
-                'availability_status',
-              ]);
-              final priceValue = _readText(row, [
-                'visit_price',
-                'price',
-                'hourly_rate',
-                'starting_price',
-              ]);
-
-              return ProviderModel(
-                id: _readText(row, ['id', 'provider_id', 'user_id']),
-                name: name,
-                initial: _initials(name),
-                speciality: _readText(row, [
-                  'speciality',
-                  'specialty',
-                  'profession',
-                  'category_name',
-                ]),
-                rating: rating,
-                experience: experienceValue,
-                availablity: availability,
-                price: int.tryParse(priceValue) ?? 0,
-                serviceId: _readText(row, [
-                  'service_id',
-                  'category_id',
-                  'category',
-                ]),
-              );
-            })
-            .where((provider) => provider.name.isNotEmpty),
-      );
+    _isLoadingProviders = true;
+    _providersError = null;
     notifyListeners();
+    try {
+      final rows = await _supabase
+          .from('providers')
+          .select('id, category_id, name, rating, experience, price')
+          .limit(30);
+
+      _providers
+        ..clear()
+        ..addAll(
+          rows
+              .map((row) {
+                final providerRow = Map<String, dynamic>.from(row);
+                return ProviderModel(
+                  id: _readText(providerRow, ['id']),
+                  categoryId: _readText(providerRow, ['category_id']),
+                  name: _readText(providerRow, ['name']),
+                  rating: _readText(providerRow, ['rating']),
+                  experience: _readText(providerRow, ['experience']),
+                  price: _readInt(providerRow['price']),
+                );
+              })
+              .where((provider) => provider.name.isNotEmpty),
+        );
+    } catch (error) {
+      _providers.clear();
+      _providersError = error;
+    } finally {
+      _isLoadingProviders = false;
+      notifyListeners();
+    }
   }
 
   Future<List<Map<String, dynamic>>> _tryReadTables(
-    List<String> tableNames,
-  ) async {
+    List<String> tableNames, {
+    String columns = '*',
+  }) async {
     for (final tableName in tableNames) {
       try {
-        final rows = await _supabase.from(tableName).select().limit(30);
+        final rows = await _supabase.from(tableName).select(columns).limit(30);
         if (rows.isNotEmpty) {
           return rows.map((row) => Map<String, dynamic>.from(row)).toList();
         }
@@ -253,15 +187,9 @@ class ClientHomeProvider extends ChangeNotifier {
     return '';
   }
 
-  String _initials(String name) {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty) return '';
-    if (parts.length == 1) {
-      return parts.first.isEmpty ? '' : parts.first.substring(0, 1);
-    }
-    final firstInitial = parts.first.isEmpty ? '' : parts.first.substring(0, 1);
-    final secondInitial = parts[1].isEmpty ? '' : parts[1].substring(0, 1);
-    return '$firstInitial $secondInitial';
+  int _readInt(dynamic value) {
+    if (value is num) return value.round();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 
   String _serviceIcon(String iconKey) {
@@ -287,6 +215,10 @@ class ClientHomeProvider extends ChangeNotifier {
   List<ServiceModel> get services => _services;
   List<OrderModel> get orders => _orders;
   List<ProviderModel> get providers => _providers;
+  bool get isLoadingOrders => _isLoadingOrders;
+  Object? get ordersError => _ordersError;
+  bool get isLoadingProviders => _isLoadingProviders;
+  Object? get providersError => _providersError;
 
   // function that is called when the client choose service where id of the selected dercive is recieeved
   void selectService(String serviceId) {
@@ -303,7 +235,7 @@ class ClientHomeProvider extends ChangeNotifier {
     } else {
       // else return only providers related to the selected service
       return _providers.where((provider) {
-        return provider.serviceId == _selectedServiceId;
+        return provider.categoryId == _selectedServiceId;
       }).toList(); // convert it to list
     }
   }
