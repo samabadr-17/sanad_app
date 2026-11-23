@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sanad/core/constants/colors.dart';
 import 'package:sanad/core/widgets/custom_text.dart';
-import 'package:sanad/features/divisions/data/model/model.dart';
+import 'package:sanad/features/client/divisions/data/model/model.dart';
 
 class CategoryCard extends StatelessWidget {
   final Category category;

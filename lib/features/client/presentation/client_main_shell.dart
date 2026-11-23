@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sanad/core/constants/colors.dart';
-import 'package:sanad/features/divisions/presentation/screens/division.dart';
+import 'package:sanad/features/client/divisions/presentation/screens/division.dart';
 import 'package:sanad/features/client/client_home/presentation/screens/client_home_screen.dart';
 import 'package:sanad/features/client/client_requests/presentation/screens/client_requests_screen.dart';
 import 'package:sanad/l10n/app_localizations.dart';
