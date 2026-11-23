@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -10,17 +12,37 @@ class ClientHomeProvider extends ChangeNotifier {
   final List<ServiceModel> _services = [];
   final List<OrderModel> _orders = [];
   final List<ProviderModel> _providers = [];
+  late final StreamSubscription<AuthState> _authSubscription;
   bool _isLoadingOrders = false;
   Object? _ordersError;
   bool _isLoadingProviders = false;
   Object? _providersError;
 
   ClientHomeProvider() {
+    _authSubscription = _supabase.auth.onAuthStateChange.listen((state) {
+      if (state.event == AuthChangeEvent.initialSession ||
+          state.event == AuthChangeEvent.signedIn) {
+        loadHomeData();
+      } else if (state.event == AuthChangeEvent.signedOut) {
+        _orders.clear();
+        _isLoadingOrders = false;
+        _ordersError = null;
+        notifyListeners();
+      }
+    });
     loadHomeData();
   }
 
+  @override
+  void dispose() {
+    _authSubscription.cancel();
+    super.dispose();
+  }
+
   Future<void> loadHomeData() async {
-    await Future.wait([_loadServices(), _loadOrders(), _loadProviders()]);
+    // services first, because orders use them to find the category name
+    await _loadServices();
+    await Future.wait([_loadOrders(), _loadProviders()]);
   }
 
   Future<void> _loadServices() async {
@@ -69,54 +91,45 @@ class ClientHomeProvider extends ChangeNotifier {
     _ordersError = null;
     notifyListeners();
     try {
+      // plain select, no join, so it doesn't depend on a foreign key
       final rows = await _supabase
           .from('orders')
-          .select('*, category:categories(name)')
+          .select('id, category_id, notes, status, address')
           .eq('user_id', currentUserId)
           .order('created_at', ascending: false);
+
+      debugPrint('orders fetched: ${rows.length}');
 
       _orders
         ..clear()
         ..addAll(
-          rows
-              .map((value) {
-                final row = Map<String, dynamic>.from(value);
-                final notes = _readText(row, ['notes', 'description']);
-                final category = row['category'];
-                final categoryName = category is Map
-                    ? _readText(Map<String, dynamic>.from(category), ['name'])
-                    : '';
-                var title = _readText(row, [
-                  'service_type',
-                  'service_name',
-                  'category_name',
-                  'title',
-                ]);
-                if (title.isEmpty) title = categoryName;
-                if (title.isEmpty) title = notes;
-                final displayNotes = notes.isEmpty ? title : notes;
-                final status = _readText(row, [
-                  'status',
-                  'order_status',
-                  'request_status',
-                ]);
-                final id = _readText(row, [
-                  'id',
-                  'order_id',
-                  'request_id',
-                  'booking_id',
-                ]);
+          rows.map((value) {
+            final row = Map<String, dynamic>.from(value);
+            final categoryId = _readText(row, ['category_id']);
 
-                return OrderModel(
-                  id: id,
-                  title: title,
-                  status: status,
-                  notes: displayNotes,
-                );
-              })
-              .where((order) => order.title.isNotEmpty),
+            // find the service name using the category id
+            var title = '';
+            for (final service in _services) {
+              if (service.id == categoryId) {
+                title = service.title;
+                break;
+              }
+            }
+            if (title.isEmpty) title = 'Service request';
+
+            final notes = _readText(row, ['notes']);
+
+            return OrderModel(
+              id: _readText(row, ['id']),
+              title: title,
+              status: _readText(row, ['status']),
+              notes: notes.isEmpty ? title : notes,
+            );
+          }),
         );
     } catch (error) {
+      debugPrint('orders error: $error');
+      _orders.clear();
       _ordersError = error;
     } finally {
       _isLoadingOrders = false;
@@ -131,8 +144,10 @@ class ClientHomeProvider extends ChangeNotifier {
     try {
       final rows = await _supabase
           .from('providers')
-          .select('id, category_id, name, rating, experience, price')
+          .select('id, category_id, name, rating, experience_years, price')
           .limit(30);
+
+      debugPrint('providers fetched: ${rows.length}');
 
       _providers
         ..clear()
@@ -145,13 +160,14 @@ class ClientHomeProvider extends ChangeNotifier {
                   categoryId: _readText(providerRow, ['category_id']),
                   name: _readText(providerRow, ['name']),
                   rating: _readText(providerRow, ['rating']),
-                  experience: _readText(providerRow, ['experience']),
+                  experience: _readText(providerRow, ['experience_years']),
                   price: _readInt(providerRow['price']),
                 );
               })
               .where((provider) => provider.name.isNotEmpty),
         );
     } catch (error) {
+      debugPrint('providers error: $error');
       _providers.clear();
       _providersError = error;
     } finally {
@@ -187,9 +203,10 @@ class ClientHomeProvider extends ChangeNotifier {
     return '';
   }
 
+  // price is "text" in the providers table, so parse it as a number first
   int _readInt(dynamic value) {
     if (value is num) return value.round();
-    return int.tryParse(value?.toString() ?? '') ?? 0;
+    return num.tryParse(value?.toString() ?? '')?.round() ?? 0;
   }
 
   String _serviceIcon(String iconKey) {
@@ -208,10 +225,10 @@ class ClientHomeProvider extends ChangeNotifier {
     return icons[key] ?? 'assets/icons/hammer.svg';
   }
 
-  // storing id of selected servic
+  // storing id of selected service
   String? _selectedServiceId;
 
-  // getters to access private data "we can access the lists through provider"
+  // getters to access private data
   List<ServiceModel> get services => _services;
   List<OrderModel> get orders => _orders;
   List<ProviderModel> get providers => _providers;
@@ -220,23 +237,19 @@ class ClientHomeProvider extends ChangeNotifier {
   bool get isLoadingProviders => _isLoadingProviders;
   Object? get providersError => _providersError;
 
-  // function that is called when the client choose service where id of the selected dercive is recieeved
+  // called when the client chooses a service
   void selectService(String serviceId) {
     _selectedServiceId = serviceId;
-    // notify the ui that the selected service changed
     notifyListeners();
   }
 
-  // getter return list of providers acc to selected service
+  // providers filtered by the selected service
   List<ProviderModel> get filteredProviders {
-    // if no service is selected, display all providers
     if (_selectedServiceId == null) {
       return _providers;
-    } else {
-      // else return only providers related to the selected service
-      return _providers.where((provider) {
-        return provider.categoryId == _selectedServiceId;
-      }).toList(); // convert it to list
     }
+    return _providers.where((provider) {
+      return provider.categoryId == _selectedServiceId;
+    }).toList();
   }
 }
