@@ -5,6 +5,8 @@ import 'package:sanad/core/constants/colors.dart';
 import 'package:sanad/core/widgets/custom_text.dart';
 import 'package:sanad/features/client/client_home/data/model/service_model.dart';
 import 'package:sanad/features/client/client_home/presentation/manager/client_home_provider.dart';
+import 'package:sanad/features/client/divisions/data/model/model.dart';
+import 'package:sanad/features/client/divisions/presentation/screens/category_details_screen.dart';
 
 // ---------- Screen ----------
 class CategoriesScreen extends StatefulWidget {
@@ -127,7 +129,26 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           padding: const EdgeInsets.only(bottom: 12),
                           child: _CategoryTile(
                             service: service,
-                            onTap: () => provider.selectService(service.id),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CategoryDetailsScreen(
+                                    categoryId: service.id,
+                                    categoryTitle: service.title,
+                                    categoryIconKey: categoryIconGroup(
+                                      service.iconKey,
+                                      title: service.title,
+                                    ),
+                                    categoryIcon: categoryIconFor(
+                                      service.iconKey,
+                                      service.title,
+                                    ),
+                                    divisionsArr: service.divisionsArr,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       )
@@ -146,31 +167,6 @@ class _CategoryTile extends StatelessWidget {
   final VoidCallback onTap;
 
   const _CategoryTile({required this.service, required this.onTap});
-
-  IconData get _icon {
-    final value = '${service.title} ${service.icon}'.toLowerCase();
-    if (value.contains('كهرب') || value.contains('electric')) {
-      return Icons.electrical_services_outlined;
-    }
-    if (value.contains('سباك') || value.contains('plumb')) {
-      return Icons.plumbing_outlined;
-    }
-    if (value.contains('دهان') ||
-        value.contains('paint') ||
-        value.contains('نقش')) {
-      return Icons.format_paint_outlined;
-    }
-    if (value.contains('نجار') || value.contains('carp')) {
-      return Icons.hardware_outlined;
-    }
-    if (value.contains('مكيف') || value.contains('ac')) {
-      return Icons.ac_unit_outlined;
-    }
-    if (value.contains('جهاز') || value.contains('appliance')) {
-      return Icons.local_laundry_service_outlined;
-    }
-    return Icons.handyman_outlined;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +198,11 @@ class _CategoryTile extends StatelessWidget {
                   color: DarkTeal.withOpacity(0.10),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(_icon, color: DarkTeal, size: 28),
+                child: Icon(
+                  categoryIconFor(service.iconKey, service.title),
+                  color: DarkTeal,
+                  size: 28,
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -223,4 +223,9 @@ class _CategoryTile extends StatelessWidget {
       ),
     );
   }
+}
+
+IconData categoryIconFor(String iconKey, String title) {
+  final group = categoryIconGroup(iconKey, title: title);
+  return kIcons[group] ?? Icons.build_outlined;
 }

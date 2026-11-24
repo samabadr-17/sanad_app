@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/model/order_model.dart';
 import '../../data/model/provider_model.dart';
 import '../../data/model/service_model.dart';
+import '../../../divisions/data/model/model.dart';
 
 class ClientHomeProvider extends ChangeNotifier {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -17,6 +18,7 @@ class ClientHomeProvider extends ChangeNotifier {
   Object? _ordersError;
   bool _isLoadingProviders = false;
   Object? _providersError;
+  bool? _supportsDivisionFiltering;
 
   ClientHomeProvider() {
     _authSubscription = _supabase.auth.onAuthStateChange.listen((state) {
@@ -66,10 +68,18 @@ class ClientHomeProvider extends ChangeNotifier {
                 'category_name',
               ]);
               final iconKey = _readText(row, ['icon', 'icon_key', 'iconName']);
+              final divisions =
+                  row['divisionArr'] ??
+                  row['division_arr'] ??
+                  row['divisionsArr'] ??
+                  row['divisions_arr'] ??
+                  row['divisions'];
               return ServiceModel(
                 id: id,
                 title: title,
                 icon: _serviceIcon(iconKey),
+                iconKey: iconKey,
+                divisionsArr: _readDivisions(divisions),
               );
             })
             .where((service) => service.title.isNotEmpty),
@@ -140,12 +150,29 @@ class ClientHomeProvider extends ChangeNotifier {
   Future<void> _loadProviders() async {
     _isLoadingProviders = true;
     _providersError = null;
+    _supportsDivisionFiltering = null;
     notifyListeners();
     try {
-      final rows = await _supabase
-          .from('providers')
-          .select('id, category_id, name, rating, experience_years, price')
-          .limit(30);
+      List<dynamic> rows;
+      try {
+        rows = await _supabase
+            .from('providers')
+            .select(
+              'id, category_id, division_key, name, rating, experience_years, price',
+            )
+            .limit(30);
+        _supportsDivisionFiltering = true;
+      } on PostgrestException catch (error) {
+        if (!error.message.toLowerCase().contains('division_key')) rethrow;
+        debugPrint(
+          'providers table has no division_key column; loading category providers only',
+        );
+        rows = await _supabase
+            .from('providers')
+            .select('id, category_id, name, rating, experience_years, price')
+            .limit(30);
+        _supportsDivisionFiltering = false;
+      }
 
       debugPrint('providers fetched: ${rows.length}');
 
@@ -158,6 +185,9 @@ class ClientHomeProvider extends ChangeNotifier {
                 return ProviderModel(
                   id: _readText(providerRow, ['id']),
                   categoryId: _readText(providerRow, ['category_id']),
+                  divisionKey: _readText(providerRow, [
+                    'division_key',
+                  ]).toLowerCase(),
                   name: _readText(providerRow, ['name']),
                   rating: _readText(providerRow, ['rating']),
                   experience: _readText(providerRow, ['experience_years']),
@@ -203,6 +233,14 @@ class ClientHomeProvider extends ChangeNotifier {
     return '';
   }
 
+  List<DivisionModel> _readDivisions(dynamic value) {
+    if (value is! List) return const [];
+    return value
+        .map(DivisionModel.fromValue)
+        .where((division) => division.name.isNotEmpty)
+        .toList();
+  }
+
   // price is "text" in the providers table, so parse it as a number first
   int _readInt(dynamic value) {
     if (value is num) return value.round();
@@ -236,11 +274,32 @@ class ClientHomeProvider extends ChangeNotifier {
   Object? get ordersError => _ordersError;
   bool get isLoadingProviders => _isLoadingProviders;
   Object? get providersError => _providersError;
+  bool get supportsDivisionFiltering =>
+      _supportsDivisionFiltering ?? false;
 
   // called when the client chooses a service
   void selectService(String serviceId) {
     _selectedServiceId = serviceId;
     notifyListeners();
+  }
+
+  List<ProviderModel> providersForCategory(String categoryId) {
+    return _providers
+        .where((provider) => provider.categoryId == categoryId)
+        .toList();
+  }
+
+  List<ProviderModel> providersForDivision(
+    String categoryId,
+    String divisionKey,
+  ) {
+    return _providers
+        .where(
+          (provider) =>
+              provider.categoryId == categoryId &&
+              provider.divisionKey == divisionKey,
+        )
+        .toList();
   }
 
   // providers filtered by the selected service
