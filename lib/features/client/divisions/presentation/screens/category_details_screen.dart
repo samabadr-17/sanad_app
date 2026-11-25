@@ -6,6 +6,7 @@ import 'package:sanad/core/widgets/custom_text.dart';
 import 'package:sanad/features/client/client_home/presentation/manager/client_home_provider.dart';
 import 'package:sanad/features/client/client_home/presentation/widgets/provider_card.dart';
 import 'package:sanad/features/client/divisions/data/model/model.dart';
+import 'package:sanad/features/client/provider_profile/presentation/screens/profile.dart';
 
 class CategoryDetailsScreen extends StatefulWidget {
   final String categoryId;
@@ -205,6 +206,15 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                     );
                   },
                 ),
+              // TextButton(
+              //   onPressed: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(builder: (context) => Profile()),
+              //     );
+              //   },
+              //   child: Text("Go to provider screen"),
+              // ),
               const SizedBox(height: 24),
               _SectionTitle(title: 'متخصصون في منطقتك'),
               const SizedBox(height: 10),
