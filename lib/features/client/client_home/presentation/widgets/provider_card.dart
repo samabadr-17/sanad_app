@@ -8,8 +8,13 @@ import '../../../../../l10n/app_localizations.dart';
 
 class ProviderCards extends StatelessWidget {
   final List<ProviderModel> providers;
+  final String? selectedDivisionName;
 
-  const ProviderCards({super.key, required this.providers});
+  const ProviderCards({
+    super.key,
+    required this.providers,
+    this.selectedDivisionName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +31,10 @@ class ProviderCards extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => Profile(providerId: provider.id),
+                builder: (_) => Profile(
+                  providerId: provider.id,
+                  selectedDivisionName: selectedDivisionName,
+                ),
               ),
             );
           },

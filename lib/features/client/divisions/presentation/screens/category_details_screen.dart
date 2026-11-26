@@ -29,17 +29,15 @@ class CategoryDetailsScreen extends StatefulWidget {
 }
 
 class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
-  String? _selectedDivisionKey;
+  String? _selectedDivisionName;
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ClientHomeProvider>();
-    final categoryProviders = _selectedDivisionKey == null
-        ? provider.providersForCategory(widget.categoryId)
-        : provider.providersForDivision(
-            widget.categoryId,
-            _selectedDivisionKey!,
-          );
+    // Always show all providers of this category (no division filtering).
+    final categoryProviders = provider.providersForCategory(
+      widget.categoryId,
+    );
 
     return Scaffold(
       backgroundColor: Cream,
@@ -166,19 +164,14 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                   ),
                   itemBuilder: (context, index) {
                     final division = widget.divisionsArr[index];
-                    final isSelected =
-                        division.divisionKey == _selectedDivisionKey;
+                    final isSelected = division.name == _selectedDivisionName;
                     return Material(
                       color: isSelected ? Cream : SeaShell,
                       borderRadius: BorderRadius.circular(16),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
                         onTap: () {
-                          setState(() {
-                            _selectedDivisionKey = isSelected
-                                ? null
-                                : division.divisionKey;
-                          });
+                          setState(() => _selectedDivisionName = division.name);
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -248,13 +241,6 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                     ],
                   ),
                 )
-              else if (_selectedDivisionKey != null &&
-                  !provider.supportsDivisionFiltering)
-                Text(
-                  'تصفية مقدمي الخدمة حسب القسم الفرعي تتطلب إضافة division_key لجدول providers',
-                  textAlign: TextAlign.right,
-                  style: GoogleFonts.cairo(color: DimGray, fontSize: 13),
-                )
               else if (categoryProviders.isEmpty)
                 Text(
                   'لا يوجد مقدمو خدمة لهذا القسم حاليًا',
@@ -262,7 +248,29 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                   style: GoogleFonts.cairo(color: DimGray, fontSize: 13),
                 )
               else
-                ProviderCards(providers: categoryProviders),
+                ProviderCards(
+                  providers: categoryProviders,
+                  selectedDivisionName: _selectedDivisionName,
+                ),
+
+              Container(
+                width: 200,
+                height: 70,
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Center(
+                  child: Text(
+                    "click on the provider to see him",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
