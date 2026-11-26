@@ -69,7 +69,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               AppText(
                 'استكشف الخدمات',
                 style: GoogleFonts.cairo(
-                  color: Rust,
+                  color: DarkTeal,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -91,13 +91,20 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 child: TextField(
                   onChanged: (value) => setState(() => _query = value),
                   textAlign: TextAlign.right,
-                  style: GoogleFonts.cairo(color: DarkTeal, fontSize: 14),
+                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 14),
                   cursorColor: Rust,
                   decoration: InputDecoration(
+                    filled: true,
+                    fillColor: DarkTeal,
                     hintText: 'ابحث عن خدمة أو عطل',
-                    hintStyle: GoogleFonts.cairo(color: DimGray, fontSize: 14),
-                    suffixIcon: const Icon(Icons.search, color: DarkTeal),
-                    border: InputBorder.none,
+                    hintStyle: GoogleFonts.cairo(color: Colors.white, fontSize: 14),
+                    suffixIcon: const Icon(Icons.search, color: Colors.white),
+
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
+                    ),
+
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 18,
                       vertical: 18,
@@ -171,7 +178,7 @@ class _CategoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: SeaShell,
+      color: StoneWhite,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),

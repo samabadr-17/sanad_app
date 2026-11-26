@@ -80,7 +80,10 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
               const SizedBox(height: 20),
 
               Container(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28, // Left and right
+                  vertical: 18, // Top and bottom
+                ),
                 decoration: BoxDecoration(
                   color: DarkTeal,
                   borderRadius: BorderRadius.circular(18),
@@ -94,31 +97,42 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                   ],
                 ),
                 child: Column(
-                  textDirection: TextDirection.ltr,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 52,
-                      height: 52,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: DarkTeal.withOpacity(0.10),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(
-                        Icons.abc,
-                        color: Colors.white,
-                        size: 30,
+                    // Icon at the top left
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: 52,
+                        height: 52,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.10),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          kIcons[widget.categoryIconKey] ?? Icons.build_outlined,
+                          color: Colors.white,
+                          size: 30,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 4),
+
+                    const SizedBox(height: 12),
+
+                    // First text (bigger)
                     AppText(
-                      'خدمه راقيه',
+                      'خدمه راقيه تستحقها',
                       style: GoogleFonts.cairo(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 4),
+
+                    const SizedBox(height: 6),
+
+                    // Second text
                     AppText(
                       'شغل احترافي علي ايد اهل الخبره',
                       style: GoogleFonts.cairo(
@@ -206,15 +220,6 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen> {
                     );
                   },
                 ),
-              // TextButton(
-              //   onPressed: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(builder: (context) => Profile()),
-              //     );
-              //   },
-              //   child: Text("Go to provider screen"),
-              // ),
               const SizedBox(height: 24),
               _SectionTitle(title: 'متخصصون في منطقتك'),
               const SizedBox(height: 10),
@@ -277,7 +282,7 @@ class _SectionTitle extends StatelessWidget {
       title,
       textAlign: TextAlign.right,
       style: GoogleFonts.cairo(
-        color: Rust,
+        color: DarkTeal,
         fontSize: 16,
         fontWeight: FontWeight.bold,
       ),
